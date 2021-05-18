@@ -28,7 +28,7 @@ o
 ```
 ./mutual_auth_rest <SECONDS>
 ```
-<SECONDS> è il numero di secondi impostato per il ping. Se viene passato un valore uguale o inferiore a 0 viene disattivato.
+\<SECONDS\> è il numero di secondi impostato per il ping. Se viene passato un valore uguale o inferiore a 0 viene disattivato.
 
 ## Funzionamento
 Appena il programma viene attivato il terminale testa sia il client che il server **http** che il client e il server **https** effettuando dei **ping**. 
