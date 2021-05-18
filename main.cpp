@@ -9,9 +9,21 @@ using namespace httplib;
 void startServerSSL() 
 {
     SSLServer svrs("../server/server-crt.pem", "../server/server-key.pem", "../rootCA/rootCA-crt.pem");
-    svrs.Get("/", [](const Request &req, Response &res) {
-        res.set_content("Successful! You are in!", "text/plain");
+    svrs.Post("/", [](const Request &req, Response &res) {
+        string str;
+        if(req.body == "{\"password\": \"secret\"}")
+            str = "success";
+        else
+            str = "error";
+        res.set_content("{\"result\": \"" + str + "\"}", "application/json");
     });
+    svrs.Get("/", [](const Request &req, Response &res) {
+        res.set_content("{\"result\": \"success\"}", "application/json");
+    });
+    svrs.set_error_handler([](const Request &req, Response &res) {
+        res.set_content("{\"result\": \"error\"}", "application/json");
+    });
+    cout << "HTTPS server start!" << endl;
     svrs.listen("0.0.0.0", 4443);
 }
     
@@ -21,35 +33,30 @@ void startServer()
     svr.Get("/", [](const Request &req, Response &res) {
         res.set_content("<a href='https://0.0.0.0:4443/'>Enter SSL</a>", "text/html");
     });
+    cout << "HTTP server start!" << endl;
     svr.listen("0.0.0.0", 8080);
 }
 
-void startClientSSL(int sec) 
+void startPing(int sec) 
 {
-    while(true) {
+    while(sec > 0) {
         sleep(sec);
         Client cli("https://0.0.0.0:4443", "../client/client-crt.pem", "../client/client-key.pem");
         cli.set_ca_cert_path("../rootCA/rootCA-crt.pem");
         cli.enable_server_certificate_verification(false);
         auto res = cli.Get("/");
-        cout << "https: status = " + to_string(res->status) + " - body = " + res->body << endl;
-    }
-}
-
-void startClient(int sec) 
-{
-    while(true) {
-        sleep(sec);
-        Client cli("http://0.0.0.0:8080");
-        auto res = cli.Get("/");
-        cout << "http: status = " + to_string(res->status) + " - body = " + res->body << endl;
+        cout << "https get : status = " + to_string(res->status) + " - body = " + res->body << endl;
+        string body = "{\"password\": \"secret\"}";
+        res = cli.Post("/", body.c_str(), "application/json");
+        cout << "https post : status = " + to_string(res->status) + " - body = " + res->body << endl;
     }
 }
 
 int main(int argc, char** argv) {
-    thread serverSSL(startServerSSL), server(startServer), clientSSL(startClientSSL, 2), client(startClient, 2);
+    int sec = 2;
+    if(argc > 1) sec = atoi(argv[1]);
+    thread serverSSL(startServerSSL), server(startServer), pingSSL(startPing, sec);
     serverSSL.join();
     server.join();
-    clientSSL.join();
-    client.join();
+    pingSSL.join();
 }
