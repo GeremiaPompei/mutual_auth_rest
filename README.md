@@ -8,6 +8,28 @@ in modo agevole. Oltre a ciò essa è implementata in un unico file h, quindi pe
 Vi è lo script linux [generate-keys.sh](https://github.com/GeremiaPompei/mutual_auth_rest/blob/master/generate_keys.sh) per generare le chiavi che servono per 
 effettuare la mutua autenticazione.
 
+# Prerequisiti
+- **cmake**
+- **openssl**
+
+# Build
+```
+mkdir build
+cd build
+cmake ..
+make
+```
+
+## Esecuzione
+```
+./mutual_auth_rest
+```
+o
+```
+./mutual_auth_rest <SECONDS>
+```
+<SECONDS> è il numero di secondi impostato per il ping. Se viene passato un valore uguale o inferiore a 0 viene disattivato.
+
 ## Funzionamento
 Appena il programma viene attivato il terminale testa sia il client che il server **http** che il client e il server **https** effettuando dei **ping**. 
 Essi vengono inviati ogni 2 secondi.
