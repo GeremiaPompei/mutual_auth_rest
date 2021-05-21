@@ -20,6 +20,17 @@ void startServerSSL()
     svrs.Get("/", [](const Request &req, Response &res) {
         res.set_content("{\"result\": \"success\"}", "application/json");
     });
+    svrs.Delete("/", [](const Request &req, Response &res) {
+        res.set_content("{\"result\": \"success\"}", "application/json");
+    });
+    svrs.Put("/", [](const Request &req, Response &res) {
+        string str;
+        if(req.body == "{\"password\": \"secret\"}")
+            str = "success";
+        else
+            str = "error";
+        res.set_content("{\"result\": \"" + str + "\"}", "application/json");
+    });
     svrs.set_error_handler([](const Request &req, Response &res) {
         res.set_content("{\"result\": \"error\"}", "application/json");
     });
@@ -46,9 +57,13 @@ void startPing(int sec)
         cli.enable_server_certificate_verification(false);
         auto res = cli.Get("/");
         cout << "https get : status = " + to_string(res->status) + " - body = " + res->body << endl;
+        res = cli.Delete("/");
+        cout << "https delete : status = " + to_string(res->status) + " - body = " + res->body << endl;
         string body = "{\"password\": \"secret\"}";
         res = cli.Post("/", body.c_str(), "application/json");
         cout << "https post : status = " + to_string(res->status) + " - body = " + res->body << endl;
+        res = cli.Put("/", body.c_str(), "application/json");
+        cout << "https put : status = " + to_string(res->status) + " - body = " + res->body << endl;
     }
 }
 

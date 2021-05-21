@@ -26,5 +26,5 @@ cd client
 openssl genrsa -out client-key.pem 2048
 openssl req -new -sha256 -key client-key.pem -subj "/C=NL/ST=UTRECHT/O=Some company/CN=Some ip" -out client-csr.pem
 openssl x509 -req -in client-csr.pem -CA ../rootCA/rootCA-crt.pem -CAkey ../rootCA/rootCA-key.pem -CAcreateserial -out client-crt.pem -days 500 -sha256
-openssl pkcs12 -export -clcerts -in client-crt.pem -inkey client-key.pem -out client.p12
+openssl pkcs12 -export -clcerts -in client-crt.pem -inkey client-key.pem -out client.p12 -password pass:
 cd ..
